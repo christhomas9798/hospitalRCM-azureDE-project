@@ -1,0 +1,9 @@
+{
+	"name": "la-adf-9798",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5b628b5d-e80f-47ff-8ce1-4412099aec1a",
+		"tenantId": "37d86849-791c-40b4-9328-10a514eb7914"
+	}
+}
