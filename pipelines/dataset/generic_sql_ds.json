@@ -5,7 +5,10 @@
 			"referenceName": "ls_lasql",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"p_database": "ladb9798"
+				"p_database": {
+					"value": "@dataset().p_db",
+					"type": "Expression"
+				}
 			}
 		},
 		"parameters": {
@@ -13,6 +16,9 @@
 				"type": "string"
 			},
 			"p_table": {
+				"type": "string"
+			},
+			"p_db": {
 				"type": "string"
 			}
 		},

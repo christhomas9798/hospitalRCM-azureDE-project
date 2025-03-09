@@ -116,7 +116,7 @@
 								},
 								"ifTrueActivities": [
 									{
-										"name": "Copy data1",
+										"name": "Copy to archive",
 										"type": "Copy",
 										"dependsOn": [],
 										"policy": {
@@ -192,6 +192,141 @@
 												}
 											}
 										]
+									}
+								]
+							}
+						},
+						{
+							"name": "If Condition2",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "If Condition1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().loadtype,'Full' )",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "full load",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureSqlSource",
+												"sqlReaderQuery": {
+													"value": "@concat('select *,''',item().datasource,''' as datasource from ',item().tablename)",
+													"type": "Expression"
+												},
+												"queryTimeout": "02:00:00",
+												"partitionOption": "None"
+											},
+											"sink": {
+												"type": "ParquetSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings",
+													"copyBehavior": "MergeFiles"
+												},
+												"formatSettings": {
+													"type": "ParquetWriteSettings"
+												}
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "generic_sql_ds",
+												"type": "DatasetReference",
+												"parameters": {
+													"p_schema": {
+														"value": "@split(item().tablename,'.')[0]",
+														"type": "Expression"
+													},
+													"p_table": {
+														"value": "@split(item().tablename,'.')[1]",
+														"type": "Expression"
+													},
+													"p_db": {
+														"value": "@item().database",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "generic_adls_parquet_ds",
+												"type": "DatasetReference",
+												"parameters": {
+													"p_container": "bronze",
+													"p_filepath": {
+														"value": "@item().targetpath",
+														"type": "Expression"
+													},
+													"p_filename": {
+														"value": "@split(item().tablename,'.')[1]",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									},
+									{
+										"name": "Lookup1",
+										"type": "Lookup",
+										"dependsOn": [
+											{
+												"activity": "full load",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureDatabricksDeltaLakeSource"
+											},
+											"dataset": {
+												"referenceName": "generic_deltalake_ds",
+												"type": "DatasetReference",
+												"parameters": {
+													"p_schema": "aa",
+													"p_table": "aa"
+												}
+											},
+											"firstRowOnly": false
+										}
 									}
 								]
 							}
