@@ -1,0 +1,10 @@
+{
+	"name": "ls_adls_lasa9798",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://lasa9798.dfs.core.windows.net/"
+		}
+	}
+}
